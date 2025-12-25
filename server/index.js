@@ -139,19 +139,25 @@ app.get("/api/search", async (req, res) => {
     if (!query) return res.status(400).json({ success: false, message: "Query required" });
 
     let appx;
+    const searchRegex = { $regex: new RegExp(`^${query}$`, "i") };
+
     if (type === "epic") {
-      appx = await Application.findOne({ epicNo: query });
+      appx = await Application.findOne({ epicNo: searchRegex });
+    } else if (type === "ref") {
+      appx = await Application.findOne({ refNo: searchRegex });
     } else {
-      appx = await Application.findOne({ refNo: query });
+      appx = await Application.findOne({
+        $or: [{ refNo: searchRegex }, { epicNo: searchRegex }],
+      });
     }
 
     if (appx) {
       const appData = appx.toObject();
-      appData.hasPhoto = !!(appData.documents?.photo);
-      appData.hasDobProof = !!(appData.documents?.dobProof);
-      appData.hasAddressProof = !!(appData.documents?.addressProof);
-      appData.hasDisabilityCert = !!(appData.documents?.disabilityCert);
-      delete appData.documents; // Exclude binary data
+      appData.hasPhoto = !!appData.documents?.photo;
+      appData.hasDobProof = !!appData.documents?.dobProof;
+      appData.hasAddressProof = !!appData.documents?.addressProof;
+      appData.hasDisabilityCert = !!appData.documents?.disabilityCert;
+      delete appData.documents;
       return res.json({ success: true, data: appData });
     }
     res.json({ success: false, message: "Not Found" });
@@ -183,16 +189,31 @@ app.post("/api/register", cpUpload, async (req, res) => {
       }
     });
 
+    // Duplicate detection (Case-Insensitive for names)
+    const { firstName, surname, dob, mobile } = req.body;
+    const existing = await Application.findOne({
+      "formData.firstName": { $regex: new RegExp(`^${firstName}$`, "i") },
+      "formData.surname": { $regex: new RegExp(`^${surname}$`, "i") },
+      "formData.dob": dob,
+      "formData.mobile": mobile,
+    });
+
+    const isDuplicate = !!existing;
+    if (isDuplicate) {
+      console.log(`Duplicate detected for: ${firstName} ${surname}, ${mobile} (Matched Ref: ${existing.refNo})`);
+    }
+
     const app = new Application({
       id,
       refNo,
       submittedAt: new Date(),
       status: "Submitted",
+      isDuplicate,
       formData: req.body,
       documents,
     });
 
-    console.log(`Saving application ${refNo}. Files: ${Object.keys(documents).join(", ")}`);
+    console.log(`Saving application ${refNo}. Duplicate: ${isDuplicate}. Files: ${Object.keys(documents).join(", ")}`);
     await app.save();
 
     res.json({ success: true, refNo });
@@ -208,35 +229,20 @@ app.get("/api/applications", async (req, res) => {
     console.log("Filtering params:", { state, district, ac });
 
     const query = {};
-    if (state) query["formData.state"] = { $regex: new RegExp(`^${state}$`, 'i') };
-    if (district) query["formData.district"] = { $regex: new RegExp(`^${district}$`, 'i') };
-    if (ac) query["formData.ac"] = { $regex: new RegExp(`^${ac}$`, 'i') };
+    if (state) query["formData.state"] = { $regex: new RegExp(`^${state}$`, "i") };
+    if (district) query["formData.district"] = { $regex: new RegExp(`^${district}$`, "i") };
+    if (ac) query["formData.ac"] = { $regex: new RegExp(`^${ac}$`, "i") };
 
-    const apps = await Application.find(query)
-      .select("-documents") // Exclude binary data
-      .sort({ submittedAt: -1 })
-      .lean();
+    const appsRaw = await Application.find(query).sort({ submittedAt: -1 }).lean();
 
-    const result = apps.map(app => {
-      // We can't use .select("-documents") and then check for presence easily if we don't fetch them at all.
-      // Actually, we can fetch everything, then transform.
-      return app;
-    });
-
-    // Re-check: If we exclude documents, we can't check if they exist.
-    // Better: Fetch with field selection if possible, or just fetch and transform.
-    // Let's refetch with presence flags.
-
-    // Correct approach using lean() and manual flags
-    const appsWithFlags = await Application.find(query).sort({ submittedAt: -1 }).lean();
-    const finalApps = appsWithFlags.map(app => {
+    const finalApps = appsRaw.map((app) => {
       const { documents, ...rest } = app;
       return {
         ...rest,
         hasPhoto: !!documents?.photo,
         hasDobProof: !!documents?.dobProof,
         hasAddressProof: !!documents?.addressProof,
-        hasDisabilityCert: !!documents?.disabilityCert
+        hasDisabilityCert: !!documents?.disabilityCert,
       };
     });
 
