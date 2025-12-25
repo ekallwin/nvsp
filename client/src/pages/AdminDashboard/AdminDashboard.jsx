@@ -32,19 +32,27 @@ export default function AdminDashboard() {
     }, []);
 
     useEffect(() => {
-        if (filterState) fetchDistricts(filterState);
+        if (filterState) {
+            fetchDistricts(filterState);
+        }
     }, [filterState]);
 
     useEffect(() => {
-        fetchApplications();
-    }, [filterState, filterDistrict, filterAc, showDuplicatesOnly, showNotReviewedOnly, searchTerm]);
+        if (filterDistrict) {
+            fetchAcs(filterDistrict);
+        }
+    }, [filterDistrict]);
+
+    // useEffect(() => {
+    //     fetchApplications();
+    // }, [filterState, filterDistrict, filterAc, showDuplicatesOnly, showNotReviewedOnly, searchTerm]);
 
     const fetchApplications = () => {
         let url = `${import.meta.env.VITE_API_BASE}/api/applications?`;
 
         // Map Codes/IDs to Names for backend filtering
-        const selectedState = states.find(s => s.stateCd === filterState);
-        const selectedDistrict = districts.find(d => d.districtCd === filterDistrict);
+        const selectedState = states.find(s => String(s.stateCd) === String(filterState));
+        const selectedDistrict = districts.find(d => String(d.districtCd) === String(filterDistrict));
         const selectedAc = acs.find(a => String(a.asmblyNo) === String(filterAc));
 
         if (selectedState) url += `state=${encodeURIComponent(selectedState.stateName)}&`;
@@ -231,7 +239,7 @@ export default function AdminDashboard() {
                     Not Reviewed
                 </label>
 
-                {/* <button onClick={fetchApplications} className="apply-btn">Apply Filters</button> */}
+                <button onClick={fetchApplications} className="apply-btn">Apply Filters</button>
             </div>
 
             <table className="applications-table">

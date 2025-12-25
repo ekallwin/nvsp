@@ -142,7 +142,6 @@ app.get("/api/search", async (req, res) => {
     if (type === "epic") {
       appx = await Application.findOne({ epicNo: query });
     } else {
-      // Default search by Ref No
       appx = await Application.findOne({ refNo: query });
     }
 
@@ -197,12 +196,15 @@ app.post("/api/register", cpUpload, async (req, res) => {
 app.get("/api/applications", async (req, res) => {
   try {
     const { state, district, ac } = req.query;
+    console.log("Filtering params:", { state, district, ac });
+
     const query = {};
-    if (state) query["formData.state"] = state;
-    if (district) query["formData.district"] = district;
-    if (ac) query["formData.ac"] = ac;
+    if (state) query["formData.state"] = { $regex: new RegExp(`^${state}$`, 'i') };
+    if (district) query["formData.district"] = { $regex: new RegExp(`^${district}$`, 'i') };
+    if (ac) query["formData.ac"] = { $regex: new RegExp(`^${ac}$`, 'i') };
 
     const apps = await Application.find(query).sort({ submittedAt: -1 });
+    console.log(`Found ${apps.length} applications matching filters`);
     res.json(apps);
   } catch (error) {
     console.error("Error fetching applications:", error);
