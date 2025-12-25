@@ -401,9 +401,9 @@ export default function Form6() {
                             <div className="col" style={{ flexDirection: "column" }}>
                                 <label>Gender <span className="required-asterisk">*</span></label>
                                 <div style={{ display: "flex", gap: "20px"  }}>
-                                    <label style={{display: "flex", alignItems: "center", gap: "5px"}}><input type="radio" name="gender" value="Male" onChange={handleChange} /> Male</label>
-                                    <label style={{display: "flex", alignItems: "center", gap: "5px"}}><input type="radio" name="gender" value="Female" onChange={handleChange} /> Female</label>
-                                    <label style={{display: "flex", alignItems: "center", gap: "5px"}}><input type="radio" name="gender" value="Third Gender" onChange={handleChange} /> Third Gender</label>
+                                    <label className="radio-btns" style={{display: "flex", alignItems: "center", gap: "5px"}}><input className="radio-btns" type="radio" name="gender" value="Male" onChange={handleChange} /> Male</label>
+                                    <label className="radio-btns" style={{display: "flex", alignItems: "center", gap: "5px"}}><input className="radio-btns" type="radio" name="gender" value="Female" onChange={handleChange} /> Female</label>
+                                    <label className="radio-btns" style={{display: "flex", alignItems: "center", gap: "5px"}}><input className="radio-btns" type="radio" name="gender" value="Third Gender" onChange={handleChange} /> Third Gender</label>
                                 </div>
                                 {errors.gender && <small className="error-text">{errors.gender}</small>}
                             </div>
@@ -679,7 +679,7 @@ const PreviewModal = ({ formData, onClose, onConfirm }) => {
                     <div >
                         <p>To,</p>
                         <p>The Electoral Registration Officer,</p>
-                        <span>{formData.state}, {formData.district}, {formData.ac}</span>
+                        <span>{formData.ac}, {formData.district}, {formData.state} </span>
                     </div>
                 </div>
 

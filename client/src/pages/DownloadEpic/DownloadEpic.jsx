@@ -103,7 +103,7 @@ export default function DownloadEpic() {
                                         <div className="card-body">
                                             <div className="card-photo-box">
                                                 {data.formData.photo ? (
-                                                    <img src={`${import.meta.env.VITE_API_BASE}${data.formData.photo}`} className="card-photo" />
+                                                    <img src={`${import.meta.env.VITE_API_BASE}/api/applications/${data.id}/photo`} className="card-photo" />
                                                 ) : "No Photo"}
                                             </div>
                                             <div className="card-info">

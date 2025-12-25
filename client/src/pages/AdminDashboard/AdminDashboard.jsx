@@ -36,8 +36,8 @@ export default function AdminDashboard() {
     }, [filterState]);
 
     useEffect(() => {
-        if (filterDistrict) fetchAcs(filterDistrict);
-    }, [filterDistrict]);
+        fetchApplications();
+    }, [filterState, filterDistrict, filterAc, showDuplicatesOnly, showNotReviewedOnly, searchTerm]);
 
     const fetchApplications = () => {
         let url = `${import.meta.env.VITE_API_BASE}/api/applications?`;
@@ -231,7 +231,7 @@ export default function AdminDashboard() {
                     Not Reviewed
                 </label>
 
-                <button onClick={fetchApplications} className="apply-btn">Apply Filters</button>
+                {/* <button onClick={fetchApplications} className="apply-btn">Apply Filters</button> */}
             </div>
 
             <table className="applications-table">
@@ -318,14 +318,14 @@ export default function AdminDashboard() {
                             <div>
                                 <h3 className="section-title">Photo</h3>
                                 {selectedApp.formData.photo ? (
-                                    <img src={`${import.meta.env.VITE_API_BASE}${selectedApp.formData.photo}`} className="photo-preview" />
+                                    <img src={`${import.meta.env.VITE_API_BASE}/api/applications/${selectedApp.id}/photo`} className="photo-preview" />
                                 ) : "No Photo"}
 
                                 <h3 className="section-title">Documents</h3>
                                 <ul style={{ paddingLeft: "20px" }}>
-                                    <li><strong>DOB Proof:</strong> {selectedApp.formData.dobDocType} - {selectedApp.formData.dobProof ? <a href={`${import.meta.env.VITE_API_BASE}${selectedApp.formData.dobProof}`} target="_blank" rel="noreferrer">View</a> : "None"}</li>
-                                    <li><strong>Addr Proof:</strong> {selectedApp.formData.addressDocType} - {selectedApp.formData.addressProof ? <a href={`${import.meta.env.VITE_API_BASE}${selectedApp.formData.addressProof}`} target="_blank" rel="noreferrer">View</a> : "None"}</li>
-                                    <li><strong>Disability Cert:</strong> {selectedApp.formData.disabilityCert ? <a href={`${import.meta.env.VITE_API_BASE}${selectedApp.formData.disabilityCert}`} target="_blank" rel="noreferrer">View</a> : "N/A"}</li>
+                                    <li><strong>DOB Proof:</strong> {selectedApp.formData.dobDocType} - {selectedApp.formData.dobProof ? <a href={`${import.meta.env.VITE_API_BASE}/api/applications/${selectedApp.id}/dobProof`} target="_blank" rel="noreferrer">View</a> : "None"}</li>
+                                    <li><strong>Addr Proof:</strong> {selectedApp.formData.addressDocType} - {selectedApp.formData.addressProof ? <a href={`${import.meta.env.VITE_API_BASE}/api/applications/${selectedApp.id}/addressProof`} target="_blank" rel="noreferrer">View</a> : "None"}</li>
+                                    <li><strong>Disability Cert:</strong> {selectedApp.formData.disabilityCert ? <a href={`${import.meta.env.VITE_API_BASE}/api/applications/${selectedApp.id}/disabilityCert`} target="_blank" rel="noreferrer">View</a> : "N/A"}</li>
                                 </ul>
 
                                 <h3 className="section-title">Declaration</h3>

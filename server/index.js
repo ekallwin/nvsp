@@ -196,7 +196,13 @@ app.post("/api/register", cpUpload, async (req, res) => {
 
 app.get("/api/applications", async (req, res) => {
   try {
-    const apps = await Application.find().sort({ submittedAt: -1 });
+    const { state, district, ac } = req.query;
+    const query = {};
+    if (state) query["formData.state"] = state;
+    if (district) query["formData.district"] = district;
+    if (ac) query["formData.ac"] = ac;
+
+    const apps = await Application.find(query).sort({ submittedAt: -1 });
     res.json(apps);
   } catch (error) {
     console.error("Error fetching applications:", error);
@@ -255,9 +261,28 @@ app.get("/api/track/:refNo", async (req, res) => {
   }
 });
 
+const serveFile = async (req, res, docType) => {
+  try {
+    const appx = await Application.findOne({ id: req.params.id });
+    if (!appx || !appx.documents || !appx.documents[docType]) {
+      return res.status(404).send("File not found");
+    }
+    const doc = appx.documents[docType];
+    res.set("Content-Type", doc.contentType);
+    res.send(doc.data);
+  } catch (error) {
+    console.error(`Error serving ${docType}:`, error);
+    res.status(500).send("Error serving file");
+  }
+};
+
+app.get("/api/applications/:id/photo", (req, res) => serveFile(req, res, "photo"));
+app.get("/api/applications/:id/dobProof", (req, res) => serveFile(req, res, "dobProof"));
+app.get("/api/applications/:id/addressProof", (req, res) => serveFile(req, res, "addressProof"));
+app.get("/api/applications/:id/disabilityCert", (req, res) => serveFile(req, res, "disabilityCert"));
+
 module.exports = app;
 
-// Global error handler
 app.use((err, req, res, next) => {
   console.error("Global error:", err);
   res.status(500).json({ success: false, message: "Internal Server Error" });
