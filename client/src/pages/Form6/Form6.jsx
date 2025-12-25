@@ -249,6 +249,7 @@ export default function Form6() {
             });
             const result = await res.json();
             if (result.success) {
+                console.log("Submission success:", result.refNo);
                 setSubmissionResult(result);
             } else {
                 toast.error(result.message || "Submission Failed");
@@ -400,10 +401,10 @@ export default function Form6() {
                         <div className="row">
                             <div className="col" style={{ flexDirection: "column" }}>
                                 <label>Gender <span className="required-asterisk">*</span></label>
-                                <div style={{ display: "flex", gap: "20px"  }}>
-                                    <label className="radio-btns" style={{display: "flex", alignItems: "center", gap: "5px"}}><input className="radio-btns" type="radio" name="gender" value="Male" onChange={handleChange} /> Male</label>
-                                    <label className="radio-btns" style={{display: "flex", alignItems: "center", gap: "5px"}}><input className="radio-btns" type="radio" name="gender" value="Female" onChange={handleChange} /> Female</label>
-                                    <label className="radio-btns" style={{display: "flex", alignItems: "center", gap: "5px"}}><input className="radio-btns" type="radio" name="gender" value="Third Gender" onChange={handleChange} /> Third Gender</label>
+                                <div style={{ display: "flex", gap: "20px" }}>
+                                    <label className="radio-btns" style={{ display: "flex", alignItems: "center", gap: "5px" }}><input className="radio-btns" type="radio" name="gender" value="Male" onChange={handleChange} /> Male</label>
+                                    <label className="radio-btns" style={{ display: "flex", alignItems: "center", gap: "5px" }}><input className="radio-btns" type="radio" name="gender" value="Female" onChange={handleChange} /> Female</label>
+                                    <label className="radio-btns" style={{ display: "flex", alignItems: "center", gap: "5px" }}><input className="radio-btns" type="radio" name="gender" value="Third Gender" onChange={handleChange} /> Third Gender</label>
                                 </div>
                                 {errors.gender && <small className="error-text">{errors.gender}</small>}
                             </div>
@@ -683,19 +684,19 @@ const PreviewModal = ({ formData, onClose, onConfirm }) => {
                     </div>
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", }}>
-
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
                     <div style={{ marginBottom: "15px" }}>
-                        {formData.photo && formData.photo instanceof File ? (
-                            <img
-                                src={URL.createObjectURL(formData.photo)}
-                                alt="Applicant"
-                                className="preview-photo"
-                            />
-                        ) : (
-                            <div className="preview-photo-placeholder">
-                                No Photo
+                        {(formData.photo instanceof File || formData.photo instanceof Blob) ? (
+                            <div style={{ textAlign: "center" }}>
+                                <img
+                                    src={URL.createObjectURL(formData.photo)}
+                                    alt="Applicant"
+                                    className="preview-photo"
+                                />
+                                <p style={{ fontSize: "12px", color: "#666" }}>Photograph</p>
                             </div>
+                        ) : (
+                            <div className="preview-photo-placeholder">No Photo</div>
                         )}
                     </div>
                 </div>
@@ -732,8 +733,16 @@ const PreviewModal = ({ formData, onClose, onConfirm }) => {
 
                     <h4 className="preview-section-header">Uploaded Documents</h4>
                     <p><strong>DOB Proof:</strong> {formData.dobDocType} - {formData.dobProof ? "Uploaded" : "Not Uploaded"}</p>
+                    {formData.dobProof && (formData.dobProof.type.startsWith("image/") ?
+                        <img src={URL.createObjectURL(formData.dobProof)} style={{ maxWidth: "200px", marginTop: "5px", border: "1px solid #ddd" }} /> : null)}
+
                     <p><strong>Address Proof:</strong> {formData.addressDocType} - {formData.addressProof ? "Uploaded" : "Not Uploaded"}</p>
+                    {formData.addressProof && (formData.addressProof.type.startsWith("image/") ?
+                        <img src={URL.createObjectURL(formData.addressProof)} style={{ maxWidth: "200px", marginTop: "5px", border: "1px solid #ddd" }} /> : null)}
+
                     <p><strong>Disability Certificate:</strong> {formData.disabilityCert ? "Uploaded" : "Not Uploaded"}</p>
+                    {formData.disabilityCert && (formData.disabilityCert.type.startsWith("image/") ?
+                        <img src={URL.createObjectURL(formData.disabilityCert)} style={{ maxWidth: "200px", marginTop: "5px", border: "1px solid #ddd" }} /> : null)}
 
                     <h4 className="preview-section-header">Declaration</h4>
                     <p><strong>Born In:</strong> {formData.declVillage}, {formData.declState}, {formData.declDistrict}</p>

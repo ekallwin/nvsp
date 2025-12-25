@@ -325,15 +325,32 @@ export default function AdminDashboard() {
 
                             <div>
                                 <h3 className="section-title">Photo</h3>
-                                {selectedApp.formData.photo ? (
-                                    <img src={`${import.meta.env.VITE_API_BASE}/api/applications/${selectedApp.id}/photo`} className="photo-preview" />
-                                ) : "No Photo"}
+                                {selectedApp.hasPhoto ? (
+                                    <div style={{ marginBottom: "15px" }}>
+                                        <img src={`${import.meta.env.VITE_API_BASE}/api/applications/${selectedApp.id}/photo`} className="photo-preview" style={{ maxWidth: "150px", border: "2px solid #ddd", borderRadius: "8px" }} />
+                                    </div>
+                                ) : <p style={{ color: "#888", fontStyle: "italic" }}>No Photo</p>}
 
                                 <h3 className="section-title">Documents</h3>
-                                <ul style={{ paddingLeft: "20px" }}>
-                                    <li><strong>DOB Proof:</strong> {selectedApp.formData.dobDocType} - {selectedApp.formData.dobProof ? <a href={`${import.meta.env.VITE_API_BASE}/api/applications/${selectedApp.id}/dobProof`} target="_blank" rel="noreferrer">View</a> : "None"}</li>
-                                    <li><strong>Addr Proof:</strong> {selectedApp.formData.addressDocType} - {selectedApp.formData.addressProof ? <a href={`${import.meta.env.VITE_API_BASE}/api/applications/${selectedApp.id}/addressProof`} target="_blank" rel="noreferrer">View</a> : "None"}</li>
-                                    <li><strong>Disability Cert:</strong> {selectedApp.formData.disabilityCert ? <a href={`${import.meta.env.VITE_API_BASE}/api/applications/${selectedApp.id}/disabilityCert`} target="_blank" rel="noreferrer">View</a> : "N/A"}</li>
+                                <ul style={{ paddingLeft: "20px", listStyle: "none" }}>
+                                    <li style={{ marginBottom: "8px" }}>
+                                        <strong>DOB Proof:</strong> {selectedApp.formData.dobDocType} -
+                                        {selectedApp.hasDobProof ? (
+                                            <a href={`${import.meta.env.VITE_API_BASE}/api/applications/${selectedApp.id}/dobProof`} target="_blank" rel="noreferrer" style={{ marginLeft: "10px", color: "#007bff", textDecoration: "underline" }}>View Document</a>
+                                        ) : " Not Uploaded"}
+                                    </li>
+                                    <li style={{ marginBottom: "8px" }}>
+                                        <strong>Address Proof:</strong> {selectedApp.formData.addressDocType} -
+                                        {selectedApp.hasAddressProof ? (
+                                            <a href={`${import.meta.env.VITE_API_BASE}/api/applications/${selectedApp.id}/addressProof`} target="_blank" rel="noreferrer" style={{ marginLeft: "10px", color: "#007bff", textDecoration: "underline" }}>View Document</a>
+                                        ) : " Not Uploaded"}
+                                    </li>
+                                    <li style={{ marginBottom: "8px" }}>
+                                        <strong>Disability Cert:</strong>
+                                        {selectedApp.hasDisabilityCert ? (
+                                            <a href={`${import.meta.env.VITE_API_BASE}/api/applications/${selectedApp.id}/disabilityCert`} target="_blank" rel="noreferrer" style={{ marginLeft: "10px", color: "#007bff", textDecoration: "underline" }}>View Document</a>
+                                        ) : (selectedApp.formData.disabilityCat ? " Not Uploaded" : " N/A")}
+                                    </li>
                                 </ul>
 
                                 <h3 className="section-title">Declaration</h3>

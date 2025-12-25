@@ -146,7 +146,13 @@ app.get("/api/search", async (req, res) => {
     }
 
     if (appx) {
-      return res.json({ success: true, data: appx });
+      const appData = appx.toObject();
+      appData.hasPhoto = !!(appData.documents?.photo);
+      appData.hasDobProof = !!(appData.documents?.dobProof);
+      appData.hasAddressProof = !!(appData.documents?.addressProof);
+      appData.hasDisabilityCert = !!(appData.documents?.disabilityCert);
+      delete appData.documents; // Exclude binary data
+      return res.json({ success: true, data: appData });
     }
     res.json({ success: false, message: "Not Found" });
   } catch (error) {
@@ -177,14 +183,17 @@ app.post("/api/register", cpUpload, async (req, res) => {
       }
     });
 
-    await new Application({
+    const app = new Application({
       id,
       refNo,
       submittedAt: new Date(),
       status: "Submitted",
       formData: req.body,
       documents,
-    }).save();
+    });
+
+    console.log(`Saving application ${refNo}. Files: ${Object.keys(documents).join(", ")}`);
+    await app.save();
 
     res.json({ success: true, refNo });
   } catch (error) {
@@ -203,9 +212,36 @@ app.get("/api/applications", async (req, res) => {
     if (district) query["formData.district"] = { $regex: new RegExp(`^${district}$`, 'i') };
     if (ac) query["formData.ac"] = { $regex: new RegExp(`^${ac}$`, 'i') };
 
-    const apps = await Application.find(query).sort({ submittedAt: -1 });
-    console.log(`Found ${apps.length} applications matching filters`);
-    res.json(apps);
+    const apps = await Application.find(query)
+      .select("-documents") // Exclude binary data
+      .sort({ submittedAt: -1 })
+      .lean();
+
+    const result = apps.map(app => {
+      // We can't use .select("-documents") and then check for presence easily if we don't fetch them at all.
+      // Actually, we can fetch everything, then transform.
+      return app;
+    });
+
+    // Re-check: If we exclude documents, we can't check if they exist.
+    // Better: Fetch with field selection if possible, or just fetch and transform.
+    // Let's refetch with presence flags.
+
+    // Correct approach using lean() and manual flags
+    const appsWithFlags = await Application.find(query).sort({ submittedAt: -1 }).lean();
+    const finalApps = appsWithFlags.map(app => {
+      const { documents, ...rest } = app;
+      return {
+        ...rest,
+        hasPhoto: !!documents?.photo,
+        hasDobProof: !!documents?.dobProof,
+        hasAddressProof: !!documents?.addressProof,
+        hasDisabilityCert: !!documents?.disabilityCert
+      };
+    });
+
+    console.log(`Found ${finalApps.length} applications matching filters`);
+    res.json(finalApps);
   } catch (error) {
     console.error("Error fetching applications:", error);
     res.status(500).json({ success: false, message: "Failed to fetch applications" });
@@ -256,6 +292,10 @@ app.get("/api/track/:refNo", async (req, res) => {
       status: appx.status,
       epicNo: appx.epicNo,
       rejectionReason: appx.rejectionReason,
+      hasPhoto: !!appx.documents?.photo,
+      hasDobProof: !!appx.documents?.dobProof,
+      hasAddressProof: !!appx.documents?.addressProof,
+      hasDisabilityCert: !!appx.documents?.disabilityCert
     });
   } catch (error) {
     console.error("Error tracking application:", error);
