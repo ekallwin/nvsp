@@ -1,0 +1,24 @@
+*::-webkit-scrollbar {
+  display: none !important;
+
+}
+
+* {
+  scrollbar-width: none;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+input[type="text"]:focus, 
+input[type="date"]:focus,
+ input[type="email"]:focus, 
+ input[type="month"]:focus,
+ select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    border: none;
+    outline: none;
+
+}

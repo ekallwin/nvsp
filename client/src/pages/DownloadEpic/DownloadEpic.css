@@ -1,0 +1,274 @@
+.download-page {
+    padding: 40px 20px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-image: linear-gradient(to right, #ece9e6, #ffffff);
+}
+
+.download-container {
+    max-width: 800px;
+    width: 90%;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.download-title {
+    color: #333;
+}
+
+.search-form {
+    margin-bottom: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.search-input-2 {
+    padding: 12px;
+    width: 90%;
+    max-width: 280px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-transform: uppercase;
+}
+
+.search-btn-2 {
+    padding: 12px 25px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    max-width: 300px;
+
+}
+
+.error-msg {
+    color: red;
+}
+
+.details-view-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.details-box {
+    width: 100%;
+    margin-bottom: 20px;
+    text-align: left;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.details-header {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.epic-highlight {
+    color: #007bff;
+    font-weight: bold;
+}
+
+.download-btn {
+    padding: 12px 30px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.download-btn:disabled {
+    background: #ccc;
+}
+
+.hidden-pdf-container {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+}
+
+.pdf-print-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    background: white;
+    width: 800px;
+    align-items: center;
+}
+
+.eci-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.card-pair-container {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+}
+
+.epic-card {
+    border: 2px solid #333;
+    border-radius: 10px;
+    padding: 15px;
+    width: 320px;
+    height: 200px;
+    background-color: #fff;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/9/99/Emblem_of_India.svg');
+    background-size: 40%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-blend-mode: overlay;
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header-bar {
+    border-bottom: 2px solid #333;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.card-header-title {
+    margin: 0;
+    color: #333;
+    font-size: 14px;
+}
+
+.card-header-sub {
+    margin: 0;
+    font-size: 10px;
+    color: #666;
+}
+
+.card-body {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.card-photo-box {
+    width: 80px;
+    height: 100px;
+    border: 1px solid #ddd;
+    background: #f0f0f0;
+    flex-shrink: 0;
+}
+
+.card-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-info {
+    flex: 1;
+    text-align: left;
+    font-size: 12px;
+}
+
+.card-epic-no {
+    margin: 0 0 5px 0;
+    color: #000;
+}
+
+.card-detail-item {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.card-stripe {
+    margin-top: auto;
+    height: 5px;
+    background: linear-gradient(to right, orange, white, green);
+}
+
+.card-back-body {
+    text-align: left;
+    font-size: 11px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.qr-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 5px;
+}
+
+.qr-box {
+    text-align: center;
+}
+
+.officer-sign {
+    text-align: right;
+    font-size: 10px;
+    color: #555;
+}
+
+@media (max-width: 768px) {
+    .download-page {
+        padding: 15px;
+    }
+
+    .download-container {
+        padding: 20px;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .search-form {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .search-input {
+        max-width: 100%;
+    }
+
+    .search-btn {
+        width: 100%;
+    }
+}

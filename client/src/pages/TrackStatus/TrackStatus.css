@@ -1,0 +1,179 @@
+.track-status-page {
+    padding: 40px 20px;
+    max-width: 100%;
+    min-height: 100vh;
+    background-image: linear-gradient(to right, #ece9e6, #ffffff);
+    font-family: Arial, sans-serif;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.track-container {
+    /* max-width: 800px; */
+    width: 80%;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ... existing styles ... */
+
+.rejection-box {
+    margin-top: 20px;
+    padding: 10px;
+    background: #ffe6e6;
+    border: 1px solid red;
+    border-radius: 5px;
+    color: #a00;
+}
+
+@media (max-width: 768px) {
+    /* Form6 doesn't change page padding in media query, relying on 40px 20px works well. 
+       But to be safe and "responsive", we can keep a small padding or match Form6 exactly.
+       User said "I want that form 6 layout". Form6 has NO media query for page padding.
+       So I will remove the specific page padding overwrite if it was different, 
+       but keeping it consistent is fine. Form6 uses 40px 20px globally. 
+       I will set it to match Form6's global strategy. */
+
+    .track-form {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .track-input {
+        max-width: 100%;
+    }
+
+    .track-btn {
+        width: 100%;
+    }
+}
+
+.track-title {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.track-subtitle {
+    margin-bottom: 30px;
+    color: #555;
+}
+
+.track-form {
+    margin-bottom: 30px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.track-input {
+    padding: 12px;
+    width: 90%;
+    max-width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.track-btn {
+    padding: 12px 25px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.error-msg {
+    color: red;
+    font-weight: bold;
+}
+
+.status-box {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 10px;
+    background: #f9f9f9;
+    text-align: left;
+    width: 100%;
+    max-width: 600px;
+}
+
+.status-text {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.status-label {
+    font-weight: bold;
+}
+
+.status-value {
+    font-weight: bold;
+    font-size: 18px;
+    margin-left: 10px;
+}
+
+.submitted-note {
+    font-size: 14px;
+    color: #666;
+    margin-top: 15px;
+    font-style: italic;
+}
+
+.download-link-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.download-link {
+    color: white;
+    background: #007bff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.rejection-box {
+    margin-top: 20px;
+    padding: 10px;
+    background: #ffe6e6;
+    border: 1px solid red;
+    border-radius: 5px;
+    color: #a00;
+}
+
+@media (max-width: 768px) {
+    .track-status-page {
+        padding: 20px;
+    }
+
+    .track-container {
+        padding: 20px;
+    }
+
+    .track-form {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .track-input {
+        max-width: 100%;
+    }
+
+    .track-btn {
+        width: 100%;
+    }
+}
