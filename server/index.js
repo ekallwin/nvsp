@@ -29,6 +29,7 @@ const ApplicationSchema = new mongoose.Schema({
   epicNo: { type: String, unique: true, sparse: true },
   submittedAt: Date,
   status: { type: String, default: "Submitted" },
+  isDuplicate: { type: Boolean, default: false },
   rejectionReason: { type: String, default: null },
   formData: Object,
   documents: {
@@ -189,13 +190,14 @@ app.post("/api/register", cpUpload, async (req, res) => {
       }
     });
 
-    // Duplicate detection (Case-Insensitive for names)
-    const { firstName, surname, dob, mobile } = req.body;
+    const { firstName, surname, dob, gender, district, ac } = req.body;
     const existing = await Application.findOne({
-      "formData.firstName": { $regex: new RegExp(`^${firstName}$`, "i") },
-      "formData.surname": { $regex: new RegExp(`^${surname}$`, "i") },
+      "formData.firstName": { $regex: new RegExp(`^${String(firstName).trim()}$`, "i") },
+      "formData.surname": { $regex: new RegExp(`^${String(surname).trim()}$`, "i") },
       "formData.dob": dob,
-      "formData.mobile": mobile,
+      "formData.gender": gender,
+      "formData.district": district,
+      "formData.ac": ac,
     });
 
     const isDuplicate = !!existing;

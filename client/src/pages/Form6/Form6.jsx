@@ -389,9 +389,20 @@ export default function Form6() {
                         </div>
                         {!formData.noAadhaar && (
                             <div className="row">
-                                <InputField label="Aadhaar Number" name="aadhaar" maxLength="12" placeholder="12 Digit Aadhaar" inputMode="numeric" value={formData.aadhaar} error={errors.aadhaar} required onChange={(e) => {
+                                <InputField label="Aadhaar Number" name="aadhaar" maxLength="12" placeholder="12 Digit Aadhaar" inputMode="numeric" value={formData.aadhaar} error={errors.aadhaar} success={errors.aadhaarValid && !errors.aadhaar ? "Aadhaar valid" : null} required onChange={(e) => {
                                     const val = e.target.value.replace(/\D/g, ''); e.target.value = val; handleChange(e);
-                                    if (val.length === 12 && !validateVerhoeff(val)) toast.error("Invalid Aadhaar");
+                                    if (val.length === 0) {
+                                        setErrors(prev => ({ ...prev, aadhaar: null, aadhaarValid: false }));
+                                    } else if (val.length === 12) {
+                                        if (!validateVerhoeff(val)) {
+                                            setErrors(prev => ({ ...prev, aadhaar: "Invalid Aadhaar", aadhaarValid: false }));
+                                        } else {
+                                            setErrors(prev => ({ ...prev, aadhaar: null, aadhaarValid: true }));
+                                        }
+                                    } else {
+                                        // Incomplete yet not empty
+                                        setErrors(prev => ({ ...prev, aadhaar: "Invalid Aadhaar", aadhaarValid: false }));
+                                    }
                                 }} />
                             </div>
                         )}
@@ -654,7 +665,7 @@ const Section = ({ title, children }) => (
     </div>
 );
 
-const InputField = ({ label, name, value, onChange, error, type = "text", placeholder, required = false, ...props }) => (
+const InputField = ({ label, name, value, onChange, error, success, type = "text", placeholder, required = false, ...props }) => (
     <div className={`col ${props.className || ""}`}>
         <label>{label} {required && <span className="required-asterisk">*</span>}</label>
         <input
@@ -667,6 +678,7 @@ const InputField = ({ label, name, value, onChange, error, type = "text", placeh
             style={{ ...props.style }}
         />
         {error && <small className="error-text">{error}</small>}
+        {success && !error && <small style={{ color: "green", fontWeight: "bold", marginTop: "5px" }}>{success}</small>}
     </div>
 );
 
