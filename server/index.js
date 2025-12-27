@@ -199,20 +199,16 @@ app.post("/api/register", cpUpload, async (req, res) => {
     });
 
     const normalize = (s) => String(s || "").toLowerCase().replace(/\s+/g, "");
-    const nNewFirst = normalize(firstName);
-    const nNewSurname = normalize(surname);
+    const newFullName = normalize(firstName) + normalize(surname);
 
     const existing = candidates.find(c => {
-      const nExFirst = normalize(c.formData.firstName);
-      const nExSurname = normalize(c.formData.surname);
-      const firstMatch = nNewFirst.includes(nExFirst) || nExFirst.includes(nNewFirst);
-      const surnameMatch = nNewSurname.includes(nExSurname) || nExSurname.includes(nNewSurname);
-      return firstMatch && surnameMatch && nNewFirst.length > 0;
+      const exFullName = normalize(c.formData.firstName) + normalize(c.formData.surname);
+      return (newFullName.includes(exFullName) || exFullName.includes(newFullName)) && newFullName.length > 0 && exFullName.length > 0;
     });
 
     const isDuplicate = !!existing;
     if (isDuplicate) {
-      console.log(`Fuzzy duplicate detected for: ${firstName} ${surname} (Matched Ref: ${existing.refNo})`);
+      console.log(`Fuzzy duplicate detected for: ${firstName} ${surname} (Matched Ref: ${existing.refNo}, Existing: ${existing.formData.firstName})`);
     }
 
     const app = new Application({

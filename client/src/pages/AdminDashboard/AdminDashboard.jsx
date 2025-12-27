@@ -139,7 +139,36 @@ export default function AdminDashboard() {
     };
 
     const filteredApps = applications.filter(app => {
-        if (showDuplicatesOnly && !app.isDuplicate) return false;
+        if (showDuplicatesOnly) {
+            // Show if it's marked as duplicate
+            if (app.isDuplicate) return true;
+
+            // ALSO show if it HAS a duplicate (it's the original record)
+            const normalize = (s) => String(s || "").toLowerCase().replace(/\s+/g, "");
+            const currentFullName = normalize(app.formData.firstName) + normalize(app.formData.surname);
+
+            const hasDuplicateInResult = applications.some(other => {
+                if (other.id === app.id) return false;
+                if (!other.isDuplicate) return false; // Only interested in those marked as duplicates
+
+                const matchCriteria = (
+                    other.formData.dob === app.formData.dob &&
+                    other.formData.gender === app.formData.gender &&
+                    other.formData.district === app.formData.district &&
+                    other.formData.ac === app.formData.ac
+                );
+
+                if (!matchCriteria) return false;
+
+                const otherFullName = normalize(other.formData.firstName) + normalize(other.formData.surname);
+                return currentFullName.includes(otherFullName) || otherFullName.includes(currentFullName);
+            });
+
+            if (hasDuplicateInResult) return true;
+
+            return false;
+        }
+
         if (showNotReviewedOnly && (app.status && app.status !== "Submitted")) return false;
         if (!searchTerm) return true;
         const lowerSearch = searchTerm.toLowerCase();
