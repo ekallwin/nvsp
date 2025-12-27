@@ -191,18 +191,28 @@ app.post("/api/register", cpUpload, async (req, res) => {
     });
 
     const { firstName, surname, dob, gender, district, ac } = req.body;
-    const existing = await Application.findOne({
-      "formData.firstName": { $regex: new RegExp(`^${String(firstName).trim()}$`, "i") },
-      "formData.surname": { $regex: new RegExp(`^${String(surname).trim()}$`, "i") },
+    const candidates = await Application.find({
       "formData.dob": dob,
       "formData.gender": gender,
       "formData.district": district,
       "formData.ac": ac,
     });
 
+    const normalize = (s) => String(s || "").toLowerCase().replace(/\s+/g, "");
+    const nNewFirst = normalize(firstName);
+    const nNewSurname = normalize(surname);
+
+    const existing = candidates.find(c => {
+      const nExFirst = normalize(c.formData.firstName);
+      const nExSurname = normalize(c.formData.surname);
+      const firstMatch = nNewFirst.includes(nExFirst) || nExFirst.includes(nNewFirst);
+      const surnameMatch = nNewSurname.includes(nExSurname) || nExSurname.includes(nNewSurname);
+      return firstMatch && surnameMatch && nNewFirst.length > 0;
+    });
+
     const isDuplicate = !!existing;
     if (isDuplicate) {
-      console.log(`Duplicate detected for: ${firstName} ${surname}, ${mobile} (Matched Ref: ${existing.refNo})`);
+      console.log(`Fuzzy duplicate detected for: ${firstName} ${surname} (Matched Ref: ${existing.refNo})`);
     }
 
     const app = new Application({

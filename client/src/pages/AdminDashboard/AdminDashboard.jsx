@@ -152,6 +152,7 @@ export default function AdminDashboard() {
     });
 
     const totalElectors = filteredApps.length;
+    const duplicateCount = filteredApps.filter(app => app.isDuplicate).length;
     const maleCount = filteredApps.filter(app => app.formData.gender === "Male").length;
     const femaleCount = filteredApps.filter(app => app.formData.gender === "Female").length;
     const otherCount = filteredApps.filter(app => app.formData.gender !== "Male" && app.formData.gender !== "Female").length;
@@ -191,6 +192,7 @@ export default function AdminDashboard() {
                 />
 
                 <select
+                    value={filterState}
                     onChange={e => {
                         setFilterState(e.target.value);
                         setFilterDistrict("");
@@ -205,6 +207,7 @@ export default function AdminDashboard() {
                 </select>
 
                 <select
+                    value={filterDistrict}
                     onChange={e => {
                         setFilterDistrict(e.target.value);
                         setFilterAc("");
@@ -216,7 +219,7 @@ export default function AdminDashboard() {
                     {districts.map(d => <option key={d.districtCd} value={d.districtCd}>{d.districtValue}</option>)}
                 </select>
 
-                <select onChange={e => setFilterAc(e.target.value)} className="filter-select">
+                <select value={filterAc} onChange={e => setFilterAc(e.target.value)} className="filter-select">
                     <option value="">Filter by Assembly</option>
                     {acs.map(a => <option key={a.acId} value={a.asmblyNo}>{a.asmblyNo} - {a.asmblyName}</option>)}
                 </select>
@@ -257,7 +260,7 @@ export default function AdminDashboard() {
                     {filteredApps.map(app => (
                         <tr key={app.id}>
                             <td style={{ display: 'flex', flexDirection: 'column' }}>
-                                <span> {app.isDuplicate && app.status !== 'Accepted' && <div className="duplicate-badge">Duplicate</div>}</span>
+                                <span> {app.isDuplicate && <div className="duplicate-badge">DUPLICATE</div>}</span>
 
 
                                 <strong className="ref-text">{app.refNo}</strong>
@@ -283,8 +286,9 @@ export default function AdminDashboard() {
                 </tbody>
             </table>
 
-            <div className="stats-footer" style={{ marginTop: "20px", display: "flex", gap: "20px", justifyContent: "center", fontWeight: "bold" }}>
-                <span>Total Electors: {totalElectors}</span>
+            <div className="stats-footer" style={{ marginTop: "20px", display: "flex", gap: "20px", justifyContent: "center", flexWrap: "wrap", fontWeight: "bold" }}>
+                <span>Total Applications: {totalElectors}</span>
+                <span style={{ color: "red" }}>Duplicates Found: {duplicateCount}</span>
                 <span>Male: {maleCount}</span>
                 <span>Female: {femaleCount}</span>
                 <span>Other: {otherCount}</span>
