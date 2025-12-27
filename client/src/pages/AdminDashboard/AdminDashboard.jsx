@@ -139,6 +139,22 @@ export default function AdminDashboard() {
     };
 
     const filteredApps = applications.filter(app => {
+        // 1. Search Filter (Applied first)
+        if (searchTerm) {
+            const lowerSearch = searchTerm.toLowerCase();
+            const matchesSearch = (
+                app.refNo.toLowerCase().includes(lowerSearch) ||
+                (app.epicNo && app.epicNo.toLowerCase().includes(lowerSearch)) ||
+                app.formData.firstName.toLowerCase().includes(lowerSearch) ||
+                (app.formData.surname && app.formData.surname.toLowerCase().includes(lowerSearch))
+            );
+            if (!matchesSearch) return false;
+        }
+
+        // 2. Status Filter
+        if (showNotReviewedOnly && (app.status && app.status !== "Submitted")) return false;
+
+        // 3. Duplicates Filter (Cumulative)
         if (showDuplicatesOnly) {
             // Show if it's marked as duplicate
             if (app.isDuplicate) return true;
@@ -149,7 +165,7 @@ export default function AdminDashboard() {
 
             const hasDuplicateInResult = applications.some(other => {
                 if (other.id === app.id) return false;
-                if (!other.isDuplicate) return false; // Only interested in those marked as duplicates
+                if (!other.isDuplicate) return false;
 
                 const matchCriteria = (
                     other.formData.dob === app.formData.dob &&
@@ -169,15 +185,7 @@ export default function AdminDashboard() {
             return false;
         }
 
-        if (showNotReviewedOnly && (app.status && app.status !== "Submitted")) return false;
-        if (!searchTerm) return true;
-        const lowerSearch = searchTerm.toLowerCase();
-        return (
-            app.refNo.toLowerCase().includes(lowerSearch) ||
-            (app.epicNo && app.epicNo.toLowerCase().includes(lowerSearch)) ||
-            app.formData.firstName.toLowerCase().includes(lowerSearch) ||
-            (app.formData.surname && app.formData.surname.toLowerCase().includes(lowerSearch))
-        );
+        return true;
     });
 
     const totalElectors = filteredApps.length;
