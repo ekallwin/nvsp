@@ -64,6 +64,38 @@ const generateEpicNumber = () => {
 const generateRefNumber = () =>
   "S" + Date.now().toString().slice(-8) + Math.floor(Math.random() * 1000);
 
+const normalize = (s) => String(s || "").toLowerCase().replace(/\s+/g, "");
+
+const updateDuplicates = async (criteria) => {
+  const { dob, gender, district, ac } = criteria;
+  const candidates = await Application.find({
+    "formData.dob": dob,
+    "formData.gender": gender,
+    "formData.district": district,
+    "formData.ac": ac,
+    status: { $ne: "Rejected" },
+  });
+
+  for (const app of candidates) {
+    const nameA = normalize(app.formData.firstName) + normalize(app.formData.surname);
+    const hasPeer = candidates.some((peer) => {
+      if (peer.id === app.id) return false;
+      const nameB =
+        normalize(peer.formData.firstName) + normalize(peer.formData.surname);
+      return (
+        (nameA.includes(nameB) || nameB.includes(nameA)) &&
+        nameA.length > 0 &&
+        nameB.length > 0
+      );
+    });
+
+    if (app.isDuplicate !== hasPeer) {
+      app.isDuplicate = hasPeer;
+      await app.save();
+    }
+  }
+};
+
 
 const axios = require("axios");
 
@@ -191,38 +223,20 @@ app.post("/api/register", cpUpload, async (req, res) => {
     });
 
     const { firstName, surname, dob, gender, district, ac } = req.body;
-    const candidates = await Application.find({
-      "formData.dob": dob,
-      "formData.gender": gender,
-      "formData.district": district,
-      "formData.ac": ac,
-    });
 
-    const normalize = (s) => String(s || "").toLowerCase().replace(/\s+/g, "");
-    const newFullName = normalize(firstName) + normalize(surname);
-
-    const existing = candidates.find(c => {
-      const exFullName = normalize(c.formData.firstName) + normalize(c.formData.surname);
-      return (newFullName.includes(exFullName) || exFullName.includes(newFullName)) && newFullName.length > 0 && exFullName.length > 0;
-    });
-
-    const isDuplicate = !!existing;
-    if (isDuplicate) {
-      console.log(`Fuzzy duplicate detected for: ${firstName} ${surname} (Matched Ref: ${existing.refNo}, Existing: ${existing.formData.firstName})`);
-    }
-
+    // We save first, then update all potential duplicates in the group
     const app = new Application({
       id,
       refNo,
       submittedAt: new Date(),
       status: "Submitted",
-      isDuplicate,
+      isDuplicate: false, // Default, will be updated by updateDuplicates
       formData: req.body,
       documents,
     });
 
-    console.log(`Saving application ${refNo}. Duplicate: ${isDuplicate}. Files: ${Object.keys(documents).join(", ")}`);
     await app.save();
+    await updateDuplicates(req.body);
 
     res.json({ success: true, refNo });
   } catch (error) {
@@ -267,6 +281,7 @@ app.put("/api/applications/:id/status", async (req, res) => {
     const appx = await Application.findOne({ id: req.params.id });
     if (!appx) return res.status(404).json({ success: false });
 
+    const oldStatus = appx.status;
     appx.status = req.body.status;
     appx.rejectionReason = req.body.rejectionReason || null;
 
@@ -279,6 +294,16 @@ app.put("/api/applications/:id/status", async (req, res) => {
     }
 
     await appx.save();
+
+    // Re-evaluate duplicates for the group if status changed to/from "Rejected"
+    if (oldStatus === "Rejected" || req.body.status === "Rejected") {
+      if (req.body.status === "Rejected") {
+        appx.isDuplicate = false;
+        await appx.save();
+      }
+      await updateDuplicates(appx.formData);
+    }
+
     res.json({ success: true });
   } catch (error) {
     console.error("Error updating application status:", error);
@@ -288,7 +313,12 @@ app.put("/api/applications/:id/status", async (req, res) => {
 
 app.delete("/api/applications/:id", async (req, res) => {
   try {
-    await Application.deleteOne({ id: req.params.id });
+    const appx = await Application.findOne({ id: req.params.id });
+    if (appx) {
+      const formData = appx.formData;
+      await Application.deleteOne({ id: req.params.id });
+      await updateDuplicates(formData);
+    }
     res.json({ success: true });
   } catch (error) {
     console.error("Error deleting application:", error);

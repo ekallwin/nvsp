@@ -24,6 +24,7 @@ export default function Form6() {
 
     const [errors, setErrors] = useState({});
     const [submissionResult, setSubmissionResult] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [states, setStates] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -233,6 +234,7 @@ export default function Form6() {
     };
 
     const confirmSubmit = async () => {
+        setIsSubmitting(true);
         const data = new FormData();
         for (const key in formData) {
             let value = formData[key];
@@ -251,11 +253,14 @@ export default function Form6() {
             if (result.success) {
                 console.log("Submission success:", result.refNo);
                 setSubmissionResult(result);
+                setShowPreview(false);
             } else {
                 toast.error(result.message || "Submission Failed");
             }
         } catch (err) {
             toast.error("Error submitting form");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -463,7 +468,7 @@ export default function Form6() {
                             <InputField label="Post Office" name="postOffice" value={formData.postOffice} onChange={handleChange} error={errors.postOffice} required />
                         </div>
                         <div className="row">
-                            <InputField label="PIN Code" name="pinCode" maxLength="6" value={formData.pinCode} onChange={handleChange} error={errors.pinCode} required />
+                            <InputField label="PIN Code" name="pinCode" inputMode="numeric" maxLength="6" value={formData.pinCode} onChange={handleChange} error={errors.pinCode} required />
                             <InputField label="Tehsil/Taluqa" name="tehsil" value={formData.tehsil} onChange={handleChange} error={errors.tehsil} required />
                         </div>
                         <div className="row">
@@ -624,13 +629,15 @@ export default function Form6() {
                     </Section>
 
                     <div className="submit-btn-container">
-                        <button type="submit" className="submit-btn">Submit Application</button>
+                        <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                            {isSubmitting ? "Processing..." : "Submit Application"}
+                        </button>
                     </div>
 
                 </form>
             </div>
 
-            {showPreview && <PreviewModal formData={formData} onClose={() => setShowPreview(false)} onConfirm={confirmSubmit} />}
+            {showPreview && <PreviewModal formData={formData} onClose={() => setShowPreview(false)} onConfirm={confirmSubmit} isSubmitting={isSubmitting} />}
 
             {
                 submissionResult && (
@@ -682,7 +689,7 @@ const InputField = ({ label, name, value, onChange, error, success, type = "text
     </div>
 );
 
-const PreviewModal = ({ formData, onClose, onConfirm }) => {
+const PreviewModal = ({ formData, onClose, onConfirm, isSubmitting }) => {
     if (!formData) return null;
     return (
         <div className="preview-modal-overlay">
@@ -764,8 +771,10 @@ const PreviewModal = ({ formData, onClose, onConfirm }) => {
                 </div>
 
                 <div className="preview-actions">
-                    <button onClick={onClose} className="btn-outline">Edit</button>
-                    <button onClick={onConfirm} className="btn-confirm">Confirm & Submit</button>
+                    <button onClick={onClose} className="btn-outline" disabled={isSubmitting}>Edit</button>
+                    <button onClick={onConfirm} className="btn-confirm" disabled={isSubmitting}>
+                        {isSubmitting ? "Submitting..." : "Confirm & Submit"}
+                    </button>
                 </div>
             </div>
         </div>
