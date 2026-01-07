@@ -18,7 +18,6 @@ function AppContent() {
 
   return (
     <>
-      <Analytics />
       {isLoading && <Loader message={message} />}
       <div className="container">
         <Routes>
@@ -44,12 +43,15 @@ function AppContent() {
 
 function App() {
   return (
-    <LoadingProvider>
-      <BrowserRouter>
-        <Toaster position="top-right" />
-        <AppContent />
-      </BrowserRouter>
-    </LoadingProvider>
+    <>
+      <Analytics />
+      <LoadingProvider>
+        <BrowserRouter>
+          <Toaster position="top-right" />
+          <AppContent />
+        </BrowserRouter>
+      </LoadingProvider>
+    </>
   );
 }
 
