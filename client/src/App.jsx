@@ -7,17 +7,18 @@ import DownloadEpic from "./pages/DownloadEpic/DownloadEpic";
 import SearchRoll from "./pages/SearchRoll/SearchRoll";
 import TrackStatus from "./pages/TrackStatus/TrackStatus";
 import "./App.css";
-
 import { Toaster } from 'react-hot-toast';
-
 import ProtectedRoute from "./Components/ProtectedRoute.jsx";
+import { LoadingProvider, useLoading } from "./context/LoadingContext";
+import Loader from "./Components/Loader/Loader";
 
-function App() {
+function AppContent() {
+  const { isLoading, message } = useLoading();
+
   return (
-    <BrowserRouter>
-      <Toaster position="top-right" />
+    <>
+      {isLoading && <Loader message={message} />}
       <div className="container">
-
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/form-6" element={<Form6 />} />
@@ -35,8 +36,18 @@ function App() {
           <Route path="/track-status" element={<TrackStatus />} />
         </Routes>
       </div>
+    </>
+  );
+}
 
-    </BrowserRouter>
+function App() {
+  return (
+    <LoadingProvider>
+      <BrowserRouter>
+        <Toaster position="top-right" />
+        <AppContent />
+      </BrowserRouter>
+    </LoadingProvider>
   );
 }
 

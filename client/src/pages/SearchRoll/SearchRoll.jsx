@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./SearchRoll.css";
+import moment from "moment";
 
 export default function SearchRoll() {
     const [query, setQuery] = useState("");
@@ -26,14 +27,9 @@ export default function SearchRoll() {
 
     const calculateAge = (dob) => {
         if (!dob) return "";
-        const birthDate = new Date(dob);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-        return age;
+        const birthDate = moment(dob, "DD-MM-YYYY");
+        if (!birthDate.isValid()) return "N/A";
+        return moment().diff(birthDate, 'years');
     };
 
     return (

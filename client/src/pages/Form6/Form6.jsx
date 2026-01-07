@@ -3,8 +3,11 @@ import { Link } from "react-router-dom";
 import moment from "moment";
 import toast from "react-hot-toast";
 import "./Form6.css";
+import { useLoading } from "../../context/LoadingContext";
 
 export default function Form6() {
+    const { showLoading, hideLoading } = useLoading();
+
     const [formData, setFormData] = useState({
         state: "", district: "", ac: "",
         firstName: "", surname: "", photo: null,
@@ -34,9 +37,12 @@ export default function Form6() {
     const [selectedDistrictCd, setSelectedDistrictCd] = useState("");
 
     useEffect(() => {
+        showLoading("Loading Form-6...");
         fetch(`${import.meta.env.VITE_API_BASE}/api/states`)
             .then(res => res.json())
-            .then(data => setStates(Array.isArray(data) ? data : []));
+            .then(data => setStates(Array.isArray(data) ? data : []))
+            .catch(() => toast.error("Failed to load states"))
+            .finally(() => hideLoading());
     }, []);
 
     useEffect(() => {
@@ -235,6 +241,7 @@ export default function Form6() {
 
     const confirmSubmit = async () => {
         setIsSubmitting(true);
+        showLoading("Submitting application...");
         const data = new FormData();
         for (const key in formData) {
             let value = formData[key];
@@ -261,6 +268,7 @@ export default function Form6() {
             toast.error("Error submitting form");
         } finally {
             setIsSubmitting(false);
+            hideLoading();
         }
     };
 
@@ -270,11 +278,13 @@ export default function Form6() {
         setFormData(prev => ({ ...prev, [stateField]: name, [districtField]: "" }));
         setErrors(prev => ({ ...prev, [stateField]: null, [districtField]: null }));
         if (code) {
-            fetch(`${import.meta.env.VITE_API_BASE}/api/districts/${code}`).then(res => res.json()).then(data => {
-                const list = Array.isArray(data) ? data : [];
-                if (districtField === 'districtP') setDistrictsP(list);
-                else if (districtField === 'declDistrict') setDistrictsD(list);
-            });
+            fetch(`${import.meta.env.VITE_API_BASE}/api/districts/${code}`)
+                .then(res => res.json())
+                .then(data => {
+                    const list = Array.isArray(data) ? data : [];
+                    if (districtField === 'districtP') setDistrictsP(list);
+                    else if (districtField === 'declDistrict') setDistrictsD(list);
+                });
         }
     };
     const handleAddressDistrictChange = (e, districtField) => {
@@ -405,7 +415,6 @@ export default function Form6() {
                                             setErrors(prev => ({ ...prev, aadhaar: null, aadhaarValid: true }));
                                         }
                                     } else {
-                                        // Incomplete yet not empty
                                         setErrors(prev => ({ ...prev, aadhaar: "Invalid Aadhaar", aadhaarValid: false }));
                                     }
                                 }} />

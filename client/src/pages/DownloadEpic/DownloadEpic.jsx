@@ -141,6 +141,9 @@ export default function DownloadEpic() {
                                         </div>
                                     </div>
                                 </div>
+                                <div>
+                                    <p>This is a sample project. This is not treated as original Voter ID</p>
+                                </div>
                             </div>
                         </div>
                     </div>
