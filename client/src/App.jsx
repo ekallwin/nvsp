@@ -11,12 +11,14 @@ import { Toaster } from 'react-hot-toast';
 import ProtectedRoute from "./Components/ProtectedRoute.jsx";
 import { LoadingProvider, useLoading } from "./context/LoadingContext";
 import Loader from "./Components/Loader/Loader";
+import { Analytics } from "@vercel/analytics/react"
 
 function AppContent() {
   const { isLoading, message } = useLoading();
 
   return (
     <>
+      <Analytics />
       {isLoading && <Loader message={message} />}
       <div className="container">
         <Routes>
